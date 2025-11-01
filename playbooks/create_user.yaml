@@ -1,0 +1,40 @@
+---
+- name: Create a new user and configure GitHub access
+  hosts: laptops
+  become: yes
+  vars_prompt:
+    - name: "username"
+      prompt: "Username to create"
+    - name: "password"
+      prompt: "Password for user (will be hashed)"
+      private: yes
+    - name: "git_name"
+      prompt: "Git user.name"
+      default: ""
+    - name: "git_email"
+      prompt: "Git user.email"
+      default: ""
+    - name: "github_token"
+      prompt: "GitHub token (leave blank to skip)"
+      private: yes
+      default: ""
+
+  vars:
+    ssh_key_type: ed25519
+
+  tasks:
+    - name: Build user list from prompts
+      set_fact:
+        users:
+          - username: "{{ username }}"
+            password: "{{ password }}"
+            git_name: "{{ git_name }}"
+            git_email: "{{ git_email }}"
+            github_token: "{{ github_token }}"
+
+    - name: Include user_setup role
+      include_role:
+        name: user_setup
+      vars:
+        user_item: "{{ item }}"
+      loop: "{{ users }}"

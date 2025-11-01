@@ -1,0 +1,21 @@
+---
+- name: Generate SSH key for the user
+  become_user: "{{ user_item.username }}"
+  command: ssh-keygen -t {{ ssh_key_type }} -f ~/.ssh/id_{{ ssh_key_type }} -N ''
+  args:
+    creates: "/home/{{ user_item.username }}/.ssh/id_{{ ssh_key_type }}"
+
+- name: Start ssh-agent and add key
+  become_user: "{{ user_item.username }}"
+  shell: |
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_{{ ssh_key_type }}
+
+- name: Add SSH key to GitHub (if token provided)
+  become_user: "{{ user_item.username }}"
+  shell: |
+    echo "$GH_TOKEN" | gh auth login --with-token
+    gh ssh-key add ~/.ssh/id_{{ ssh_key_type }}.pub --title "{{ inventory_hostname }}"
+  environment:
+    GH_TOKEN: "{{ user_item.github_token }}"
+  when: user_item.github_token | length > 0

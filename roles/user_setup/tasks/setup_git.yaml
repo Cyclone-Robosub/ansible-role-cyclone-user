@@ -1,0 +1,7 @@
+---
+- name: Configure Git username and email
+  become_user: "{{ user_item.username }}"
+  template:
+    src: gitconfig.j2
+    dest: "/home/{{ user_item.username }}/.gitconfig"
+    mode: '0644'

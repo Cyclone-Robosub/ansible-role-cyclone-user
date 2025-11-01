@@ -1,0 +1,9 @@
+---
+- name: Include tasks to create user account
+  include_tasks: create_user.yml
+
+- name: Include tasks to setup git config
+  include_tasks: setup_git.yml
+
+- name: Include tasks to setup SSH and GitHub
+  include_tasks: setup_ssh.yml
