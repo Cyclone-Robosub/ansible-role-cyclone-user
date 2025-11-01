@@ -1,5 +1,4 @@
 ---
----
 # Ensure ~/.ssh exists and is owned by the user
 - name: Ensure .ssh directory exists
   file:
