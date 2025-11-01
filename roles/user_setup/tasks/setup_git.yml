@@ -1,7 +1,8 @@
 ---
-- name: Configure Git username and email
-  become_user: "{{ user_item.username }}"
+- name: Configure Git username and email (write gitconfig for user)
   template:
     src: gitconfig.j2
     dest: "/home/{{ user_item.username }}/.gitconfig"
+    owner: "{{ user_item.username }}"
+    group: "{{ user_item.username }}"
     mode: '0644'

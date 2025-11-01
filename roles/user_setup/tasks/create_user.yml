@@ -6,11 +6,3 @@
     shell: /bin/bash
     create_home: yes
     state: present
-
-- name: Ensure .ssh directory exists
-  file:
-    path: "/home/{{ user_item.username }}/.ssh"
-    state: directory
-    owner: "{{ user_item.username }}"
-    group: "{{ user_item.username }}"
-    mode: '0700'
