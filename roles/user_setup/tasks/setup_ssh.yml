@@ -1,10 +1,38 @@
 ---
-- name: Generate SSH keypair for user (idempotent)
+---
+# Ensure ~/.ssh exists and is owned by the user
+- name: Ensure .ssh directory exists
+  file:
+    path: "/home/{{ user_item.username }}/.ssh"
+    state: directory
+    owner: "{{ user_item.username }}"
+    group: "{{ user_item.username }}"
+    mode: '0700'
+
+# Generate an SSH keypair if it doesn't already exist
+- name: Generate SSH key for the user (idempotent)
   openssh_keypair:
-    path: "/home/{{ user_item.username }}/.ssh/id_ed25519"
-    type: ed25519
+    path: "/home/{{ user_item.username }}/.ssh/id_{{ ssh_key_type | default('ed25519') }}"
+    type: "{{ ssh_key_type | default('ed25519') }}"
     owner: "{{ user_item.username }}"
     group: "{{ user_item.username }}"
     mode: '0600'
-  become: yes
-  # no become_user here — the module will set ownership as requested
+  register: ssh_key_result
+
+# Start ssh-agent and add key (optional)
+- name: Add key to ssh-agent
+  become_user: "{{ user_item.username }}"
+  shell: |
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_{{ ssh_key_type | default('ed25519') }}
+  when: ssh_key_result.changed
+
+# Add SSH key to GitHub (only if token provided)
+- name: Add SSH key to GitHub via GitHub CLI
+  become_user: "{{ user_item.username }}"
+  shell: |
+    echo "$GH_TOKEN" | gh auth login --with-token
+    gh ssh-key add ~/.ssh/id_{{ ssh_key_type | default('ed25519') }}.pub --title "{{ inventory_hostname }}"
+  environment:
+    GH_TOKEN: "{{ user_item.github_token }}"
+  when: user_item.github_token | length > 0
