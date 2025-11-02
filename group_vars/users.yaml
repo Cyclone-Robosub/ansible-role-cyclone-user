@@ -43,4 +43,6 @@ users:
   - username: dannykcw
   comment: "Danny Kwong"
   uid: 2001
-  primary_group
+  primary_group: developers
+  group:
+    - dialout
