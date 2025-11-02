@@ -1,0 +1,16 @@
+# templates/gitconfig.j2
+# Git configuration for {{ item.username }}
+[user]
+    name = {{ item.git_name }}
+    email = {{ item.git_email }}
+
+{% if item.git_config is defined %}
+{% for section, options in item.git_config.items() %}
+[{{ section }}]
+{% if options is mapping %}
+{% for key, value in options.items() %}
+    {{ key }} = {{ value }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
