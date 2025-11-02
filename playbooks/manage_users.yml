@@ -29,7 +29,7 @@
         shell: "{{ item.shell | default('/bin/bash') }}"
         create_home: yes
         state: present
-        password: "{{ item.password | default(omit) }}"
+        password: "{{ vault_user_passwords[item.username]}}"
       loop: "{{ users }}"
       when: users is defined
       tags:
