@@ -1,0 +1,46 @@
+# users.yml (user definitions - non-sensitive)
+# all reference can be found in ansible.builtin.user module
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html#ansible-builtin-user-module-manage-user-accounts
+# For group, refers to ansible.builtin.group module
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html
+user_groups:
+  - name: developers
+    gid: 3000
+  
+  # - name: devops
+  #   gid: 3001
+  # - name: admins
+  #   gid: 3002
+
+users:
+  # - username: john
+  #   comment: "John Doe"
+  #   uid: 2001
+  #   primary_group: developers
+  #   groups:
+  #     - developers
+  #     - docker
+  #   shell: /bin/bash
+  
+  # - username: jane
+  #   comment: "Jane Smith"
+  #   uid: 2002
+  #   primary_group: devops
+  #   groups:
+  #     - devops
+  #     - admins
+  #     - docker
+  #     - dialout
+  #   shell: /bin/zsh
+
+  # - username: bob
+  #   comment: "Bob Johnson"
+  #   uid: 2003
+  #   primary_group: developers
+  #   groups:
+  #     - developers
+  #     - dialout
+  - username: dannykcw
+  comment: "Danny Kwong"
+  uid: 2001
+  primary_group

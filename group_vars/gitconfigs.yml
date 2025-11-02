@@ -1,0 +1,57 @@
+# git_configs.yml (Git configuration - separate from users)
+# git_name is for git username
+# git_email is your git email
+# credential you need to set up yourself the first time then should be good afterwards
+# The rest check git docs
+# https://git-scm.com/docs/git-config#_values
+git_users:
+  - username: john
+    git_name: "John Doe"
+    git_email: "john.doe@company.com"
+    git_config:
+      core:
+        editor: vim
+        autocrlf: input
+        filemode: true
+      init:
+        defaultBranch: main
+      pull:
+        rebase: false
+      push:
+        default: simple
+      color:
+        ui: auto
+      alias:
+        st: status
+        co: checkout
+        br: branch
+        ci: commit
+        lg: "log --oneline --graph --decorate"
+  
+  - username: jane
+    git_name: "Jane Smith"
+    git_email: "jane.smith@company.com"
+    git_config:
+      core:
+        editor: nano
+        autocrlf: input
+      init:
+        defaultBranch: main
+      pull:
+        rebase: true
+      push:
+        default: current
+      color:
+        ui: auto
+      alias:
+        st: status
+        co: checkout
+
+  - username: bob
+    git_name: "Bob Johnson"
+    git_email: "bob.johnson@company.com"
+    git_config:
+      core:
+        editor: vim
+      init:
+        defaultBranch: main

@@ -1,0 +1,93 @@
+# Main playbook: manage_users_git.yml
+- name: Manage Users, Groups, and Git Configuration
+  hosts: all
+  become: yes
+  vars_files:
+    - vault.yml
+  
+  tasks:
+    # Create groups
+    - name: Ensure groups exist
+      ansible.builtin.group:
+        name: "{{ item.name }}"
+        gid: "{{ item.gid | default(omit) }}"
+        state: present
+      loop: "{{ user_groups }}"
+      when: user_groups is defined
+      tags:
+        - groups
+
+    # Create users and assign to groups
+    - name: Create users
+      ansible.builtin.user:
+        name: "{{ item.username }}"
+        comment: "{{ item.comment | default(omit) }}"
+        uid: "{{ item.uid | default(omit) }}"
+        group: "{{ item.primary_group | default(omit) }}"
+        groups: "{{ item.groups | default([]) | join(',') }}"
+        append: yes
+        shell: "{{ item.shell | default('/bin/bash') }}"
+        create_home: yes
+        state: present
+        password: "{{ item.password | default(omit) }}"
+      loop: "{{ users }}"
+      when: users is defined
+      tags:
+        - users
+
+# Separate playbook for Git configuration
+- name: Configure Git for Users
+  hosts: all
+  become: yes
+  vars_files:
+    - git_configs.yml
+  
+  tasks:
+    - name: Ensure .gitconfig exists for each user
+      ansible.builtin.file:
+        path: "/home/{{ item.username }}/.gitconfig"
+        state: touch
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0644'
+      loop: "{{ git_users }}"
+      when: git_users is defined
+      tags:
+        - git
+
+    - name: Deploy .gitconfig template for each user
+      ansible.builtin.template:
+        src: templates/gitconfig.j2
+        dest: "/home/{{ item.username }}/.gitconfig"
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+        mode: '0644'
+      loop: "{{ git_users }}"
+      when: git_users is defined
+      tags:
+        - git
+
+    - name: Verify Git configuration
+      ansible.builtin.command:
+        cmd: git config --global --list
+      become_user: "{{ item.username }}"
+      loop: "{{ git_users }}"
+      register: git_config_output
+      changed_when: false
+      when: git_users is defined
+      tags:
+        - verify
+        - never
+
+    - name: Display Git configurations
+      ansible.builtin.debug:
+        msg: "{{ item.stdout_lines }}"
+      loop: "{{ git_config_output.results }}"
+      when:
+        - git_config_output is defined
+        - item.stdout_lines is defined
+      loop_control:
+        label: "{{ item.item.username }}"
+      tags:
+        - verify
+        - never
