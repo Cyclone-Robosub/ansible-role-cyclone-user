@@ -1,8 +1,0 @@
----
-- name: Ensure user account exists
-  user:
-    name: "{{ user_item.username }}"
-    password: "{{ user_item.password | password_hash('sha512') }}"
-    shell: /bin/bash
-    create_home: yes
-    state: present
